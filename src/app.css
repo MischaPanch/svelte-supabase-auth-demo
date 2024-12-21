@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	@apply mx-auto mt-10 max-w-screen-sm;
+}
+
+button {
+	@apply rounded-md bg-blue-500 px-4 py-1 text-white hover:bg-blue-600 active:bg-blue-700;
+}
+
+button:disabled {
+	@apply cursor-not-allowed bg-gray-300 text-gray-500;
+}
+
+input {
+	@apply rounded border border-gray-300 p-1;
+}
+
+select {
+	@apply rounded border border-gray-300 p-1;
+}
+
+.frame {
+	@apply w-full rounded-lg border border-gray-100 p-4 shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px];
+}
+
+.vstack {
+	@apply flex h-full flex-col items-center gap-4;
+}
+
+.hstack {
+	@apply flex w-full items-center gap-4;
+}
