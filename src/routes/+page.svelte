@@ -40,6 +40,8 @@
 </script>
 
 <div class="flex flex-col gap-8">
+	<h1 class="text-4xl font-semibold text-center">Opinion Exchange Network</h1>
+
 	<Auth {supabase} {session} {author} />
 
 	<PostForm />
