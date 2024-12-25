@@ -1,4 +1,9 @@
+# IDE
+.idea
+
 node_modules
+
+
 
 # Output
 .output
