@@ -42,14 +42,20 @@
 	});
 
 	const login = async () => {
+		console.log(`logging in with email ${email}`);
 		let signIn = true;
 
 		if (session) {
 			let { error: updateError } = await supabase.auth.updateUser({ email });
+			
+			if (updateError) {
+				console.error('error updating user email: ' + updateError);
+			}
+			else{
+				console.log(`email ${email} appears to be already attached to a user`);
+			}
 
-			console.log('email appears to be already attached to a user');
-
-			signIn = !!updateError;
+			signIn = Boolean(updateError);
 		}
 
 		verifyingLogin = false;
