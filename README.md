@@ -33,7 +33,12 @@ Usage
    ```
    bun install
    ```
-1. Run the `init-db` command to initialize the database. The schema can be found in `prisma/schema.prisma` and the database seed query in `./seed.sql`.
+1. DB model code is generated with Prisma. Run the following command to generate/update the code:
+   
+   ```
+   bun run prisma-generate
+   ```
+1. Run the `init-db` command to initialize the database. The schema can be found in `prisma/schema.prisma` and the database seed query in `seed.sql`.
    
    ```
    bun run init-db
