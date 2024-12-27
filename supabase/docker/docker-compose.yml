@@ -74,6 +74,14 @@ services:
       # https://github.com/supabase/supabase/issues/12661
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
 
+  mail:
+    container_name: supabase-mail
+    image: inbucket/inbucket:3.0.3
+    ports:
+      # - '2500:2500' # SMTP. Expose if you want to use this as fake smpt server for something else
+      # - '1100:1100' # POP3
+      - '9000:9000' # web interface
+
   auth:
     container_name: supabase-auth
     image: supabase/gotrue:v2.158.1
@@ -121,10 +129,20 @@ services:
       # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
       # GOTRUE_SMTP_MAX_FREQUENCY: 1s
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
-      GOTRUE_SMTP_HOST: ${SMTP_HOST}
-      GOTRUE_SMTP_PORT: ${SMTP_PORT}
-      GOTRUE_SMTP_USER: ${SMTP_USER}
-      GOTRUE_SMTP_PASS: ${SMTP_PASS}
+      # NOTE: for dev we use the INTERNAL NETWORK!
+      # Docker compose servies do not use the host network by default,
+      # it can be changed by setting network_mode to "host"
+      # We deploy the mail service using the inbucket image, where
+      # smtp runs on port 2500. The port mappings do not alter the internal network ports,
+      # so for dev mode the port is hardcoded here. Remove/parametrize once we move to production
+      GOTRUE_SMTP_HOST: mail
+      GOTRUE_SMTP_PORT: 2500
+      GOTRUE_SMTP_USER: 
+      GOTRUE_SMTP_PASS: 
+      # GOTRUE_SMTP_HOST: ${SMTP_HOST}
+      # GOTRUE_SMTP_PORT: ${SMTP_PORT}
+      # GOTRUE_SMTP_USER: ${SMTP_USER}
+      # GOTRUE_SMTP_PASS: ${SMTP_PASS}
       GOTRUE_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
       GOTRUE_MAILER_URLPATHS_INVITE: ${MAILER_URLPATHS_INVITE}
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: ${MAILER_URLPATHS_CONFIRMATION}
