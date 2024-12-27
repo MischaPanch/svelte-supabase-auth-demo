@@ -3,9 +3,40 @@
 	"configurations": [
 		{
 			"command": "bun run dev",
-			"name": "Run development server",
+			"name": "Start development server",
 			"request": "launch",
 			"type": "node-terminal"
+		},
+		{
+			"type": "msedge",
+			"name": "Launch Edge for debugging",
+			"request": "launch",
+			"url": "http://localhost:5173",
+			"webRoot": "${workspaceFolder}",
+			"sourceMaps": true,
+			"sourceMapPathOverrides": {
+				"webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+				"webpack:///./*": "${workspaceFolder}/*",
+				"webpack:///*": "*"
+			}
+		},
+		{
+			"type": "msedge",
+			"name": "Attach to Edge for debugging",
+			"request": "attach",
+			"port": 9222,
+			"webRoot": "${workspaceFolder}",
+			"sourceMaps": true
+		}
+	],
+	"compounds": [
+		{
+			"name": "Start Server and Edge for Debugging",
+			"configurations": ["Start development server", "Launch Edge for debugging"]
+		},
+		{
+			"name": "Start Server and Attach to Edge for Debugging",
+			"configurations": ["Start development server", "Attach to Edge for debugging"]
 		}
 	]
 }
