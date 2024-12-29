@@ -1,14 +1,25 @@
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { maxAnonPosts } from '$lib/server/constants';
+import { Prisma } from '@prisma/client';
 
-export const GET: RequestHandler = async ({ request, locals: { session, db } }) => {
+export const GET: RequestHandler = async ({ request, locals: { db, session } }) => {
+
+	if (!session) {
+		return error(401, { message: 'unauthorized' });
+	}
+
+	const authorId = session.user.id;
+
 	const posts = await db.post.findMany({
+		where: {
+			author_id: authorId
+		},
 		include: {
 			author: true
 		},
 		orderBy: {
-			date: 'desc'
+			date_created: 'desc'
 		}
 	});
 
@@ -18,19 +29,35 @@ export const GET: RequestHandler = async ({ request, locals: { session, db } }) 
 };
 
 export const POST: RequestHandler = async ({ request, locals: { db, session } }) => {
+
+	if (!session) {
+		return error(401, { message: 'unauthorized' });
+	}
+
+	const authorId = session.user.id;
+	// write author to db if not already present
+	await db.author.upsert({
+		where: {
+			id: authorId
+		},
+		create: {
+			id: authorId,
+			email: session.user.email || null,
+		},
+		update: {}
+	});;
+
+
+
 	const { text } = await request.json();
 
 	if (!text) {
 		return error(400, { message: 'text is required' });
 	}
 
-	if (!session) {
-		return error(401, { message: 'unauthorized' });
-	}
-
 	const numPosts = await db.post.count({
 		where: {
-			authorId: session.user.id
+			author_id: authorId,
 		}
 	});
 
@@ -43,8 +70,7 @@ export const POST: RequestHandler = async ({ request, locals: { db, session } })
 	const post = await db.post.create({
 		data: {
 			text,
-			date: new Date(),
-			authorId: session.user.id
+			author: {connect: {id: authorId}}
 		}
 	});
 

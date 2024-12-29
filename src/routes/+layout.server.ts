@@ -12,13 +12,13 @@ export async function load({ depends, locals: { session, supabase, db }, cookies
 		session = data.session;
 	}
 
-	const author = await db.author.findFirst({
+	const author = session ? await db.author.findFirst({
 		where: {
-			userId: session?.user.id
+			id: session.user.id
 		}
-	});
+	}) : null;
 
-	console.log(`author: ${author}`);
+	console.log(`Retrieved author: ${author}`);
 
 	if (session && author) {
 		session.user.user_metadata.name = author?.name;

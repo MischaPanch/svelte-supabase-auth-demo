@@ -20,10 +20,10 @@ export const POST: RequestHandler = async ({
 		where: {
 			AND: [
 				{
-					userId: session.user.id
+					id: session.user.id
 				},
 				{
-					userId: authorId
+					id: authorId
 				}
 			]
 		}
@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({
 
 	const updatedAuthor = await db.author.update({
 		where: {
-			userId: authorId
+			id: authorId
 		},
 		data: {
 			name: newName

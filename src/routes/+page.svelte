@@ -5,9 +5,10 @@
 	import Auth from '$lib/components/Auth.svelte';
 	import Post from '$lib/components/Post.svelte';
 	import type { AppContext, AppResponse } from '$lib/types';
-	import { postResponseSchema } from '$lib/schemas';
 	import PostForm from '$lib/components/PostForm.svelte';
+	import { postsResponseSchema } from '$lib/schemas';
 
+	
 	let { data }: { data: PageData } = $props();
 
 	let { session, author, supabase, posts } = $derived(data);
@@ -22,7 +23,7 @@
 			});
 
 			if (!res.ok) {
-				const { message } = postResponseSchema.parse(await res.json());
+				const { message } = postsResponseSchema.parse(await res.json());
 
 				return {
 					success: false,

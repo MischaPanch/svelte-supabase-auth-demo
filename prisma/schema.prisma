@@ -1,5 +1,11 @@
 generator client {
-    provider        = "prisma-client-js"
+    provider = "prisma-client-js"
+}
+
+generator zod {
+  provider = "zod-prisma-types"
+  createRelationValuesTypes = true
+  output = "../src/lib/generated/zod"
 }
 
 datasource db {
@@ -8,23 +14,30 @@ datasource db {
     directUrl = env("DIRECT_URL")
 }
 
+// Links to auth.users.id from Supabase auth
 model Author {
-    userId String @id @db.Uuid @map("user_id")
-    name   String @default("anonymous")
-    role   Role   @default(USER)
-    posts  Post[]
+    id         String    @id @db.Uuid // references auth.users.id
+    email      String?   @unique   // sync with auth.users.email
+    name       String    @default("anonymous")
+    role       Role      @default(USER)
+    posts      Post[]
+    date_created DateTime  @default(now()) 
+    date_updated DateTime  @updatedAt
 
     @@map("authors")
+    @@index([email])
 }
 
 model Post {
-    id       String   @id @default(uuid()) @db.Uuid
-    authorId String   @db.Uuid
-    author   Author   @relation(fields: [authorId], references: [userId])
-    date     DateTime
-    text     String
+    id         String   @id @default(uuid()) @db.Uuid
+    author_id  String   @db.Uuid
+    author     Author   @relation(fields: [author_id], references: [id], onDelete: Cascade)
+    text       String   @db.Text
+    date_created DateTime @default(now())
+    date_updated DateTime @updatedAt
 
     @@map("posts")
+    @@index([author_id])
 }
 
 enum Role {
