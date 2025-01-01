@@ -8,11 +8,12 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write src",
+		"lint": "eslint src",
+		"format-lint": "bun run format && bun run lint",
 		"prisma-generate": "prisma generate",
-		"init-db": "dotenv -e .env -- prisma migrate dev --name init && dotenv -e .env -- prisma db execute --file seed.sql",
-		"migrate-db": "dotenv -e .env -- prisma migrate dev"
+		"db-push": "prisma db push",
+		"db-pull": "prisma db pull"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",

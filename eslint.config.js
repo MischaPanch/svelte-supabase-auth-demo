@@ -29,6 +29,9 @@ export default ts.config(
 			parserOptions: {
 				parser: ts.parser
 			}
+		},
+		rules: {
+			'no-undef': 'off'
 		}
-	}
+	},
 );
