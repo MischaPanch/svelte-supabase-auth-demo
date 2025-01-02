@@ -1,7 +1,13 @@
 {
     "cSpell.words": [
+        "datasource",
+        "inbucket",
         "pkey",
         "supabase"
     ],
+    "cSpell.enabledFileTypes": {
+        "env": false,
+        "json": false
+    },
     "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

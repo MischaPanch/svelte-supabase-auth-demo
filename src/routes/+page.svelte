@@ -6,9 +6,8 @@
 	import Post from '$lib/components/Post.svelte';
 	import type { AppContext, AppResponse } from '$lib/types';
 	import PostForm from '$lib/components/PostForm.svelte';
-	import { postsResponseSchema } from '$lib/schemas';
+	import { PostArrayResponseSchema } from '$lib/schemas';
 
-	
 	let { data }: { data: PageData } = $props();
 
 	let { session, author, supabase, posts } = $derived(data);
@@ -23,7 +22,7 @@
 			});
 
 			if (!res.ok) {
-				const { message } = postsResponseSchema.parse(await res.json());
+				const { message } = PostArrayResponseSchema.parse(await res.json());
 
 				return {
 					success: false,
@@ -41,7 +40,7 @@
 </script>
 
 <div class="flex flex-col gap-8">
-	<h1 class="text-4xl font-semibold text-center">Opinion Exchange Network</h1>
+	<h1 class="text-center text-4xl font-semibold">Opinion Exchange Network</h1>
 
 	<Auth {supabase} {session} {author} />
 

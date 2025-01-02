@@ -1,5 +1,5 @@
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { createServerClient } from '@supabase/ssr';
 import type { Session } from '@supabase/supabase-js';
 import type { Handle } from '@sveltejs/kit';

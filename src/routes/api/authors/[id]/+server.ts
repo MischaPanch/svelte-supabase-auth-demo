@@ -41,6 +41,7 @@ export const POST: RequestHandler = async ({
 			name: newName
 		}
 	});
+	console.debug('Author updated:', { id: updatedAuthor.id, name: updatedAuthor.name });
 
 	return new Response();
 };

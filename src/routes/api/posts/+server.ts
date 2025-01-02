@@ -1,10 +1,8 @@
+import { maxAnonPosts } from '$lib/server/constants';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { maxAnonPosts } from '$lib/server/constants';
-import { Prisma } from '@prisma/client';
 
-export const GET: RequestHandler = async ({ request, locals: { db, session } }) => {
-
+export const GET: RequestHandler = async ({ locals: { db, session } }) => {
 	if (!session) {
 		return error(401, { message: 'unauthorized' });
 	}
@@ -29,7 +27,6 @@ export const GET: RequestHandler = async ({ request, locals: { db, session } }) 
 };
 
 export const POST: RequestHandler = async ({ request, locals: { db, session } }) => {
-
 	if (!session) {
 		return error(401, { message: 'unauthorized' });
 	}
@@ -42,12 +39,10 @@ export const POST: RequestHandler = async ({ request, locals: { db, session } })
 		},
 		create: {
 			id: authorId,
-			email: session.user.email || null,
+			email: session.user.email || null
 		},
 		update: {}
-	});;
-
-
+	});
 
 	const { text } = await request.json();
 
@@ -57,7 +52,7 @@ export const POST: RequestHandler = async ({ request, locals: { db, session } })
 
 	const numPosts = await db.post.count({
 		where: {
-			author_id: authorId,
+			author_id: authorId
 		}
 	});
 
@@ -70,7 +65,7 @@ export const POST: RequestHandler = async ({ request, locals: { db, session } })
 	const post = await db.post.create({
 		data: {
 			text,
-			author: {connect: {id: authorId}}
+			author: { connect: { id: authorId } }
 		}
 	});
 

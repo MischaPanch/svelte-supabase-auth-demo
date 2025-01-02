@@ -4,4 +4,3 @@
 -- you need to make the postgres user a superuser by running the following command 
 -- (for example, in the supabase dashboard SQL editor):
 alter role postgres superuser
-initial_sql_commands

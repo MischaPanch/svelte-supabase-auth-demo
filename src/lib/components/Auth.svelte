@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import type { Author } from '$lib/schemas';
+	import type { Author } from '$lib/generated/zod';
 	import type { Session, SupabaseClient } from '@supabase/supabase-js';
 	import * as EmailValidator from 'email-validator';
 	import { Spinner } from 'flowbite-svelte';
@@ -47,11 +47,10 @@
 
 		if (session) {
 			let { error: updateError } = await supabase.auth.updateUser({ email });
-			
+
 			if (updateError) {
 				console.error('error updating user email: ' + updateError);
-			}
-			else{
+			} else {
 				console.log(`email ${email} appears to be already attached to a user`);
 			}
 
@@ -128,6 +127,9 @@
 					newName: user.email
 				})
 			});
+			console.debug(
+				`Email changed to ${user.email} for author ${session?.user.id}. Response: ${res}`
+			);
 		}
 	};
 
@@ -186,12 +188,7 @@
 					disabled={verifyingOtp}
 				/>
 			{/if}
-			<button
-				onclick={() => {
-					askForOtp ? verifyOtp() : login();
-				}}
-				disabled={!submitButtonEnabled}
-			>
+			<button onclick={() => (askForOtp ? verifyOtp() : login())} disabled={!submitButtonEnabled}>
 				{#if isLoading}
 					<Spinner size={4} color="purple" />
 				{/if}
@@ -228,9 +225,3 @@
 		</div>
 	{/if}
 </div>
-
-<style lang="postcss">
-	form > div {
-		@apply flex flex-row items-center gap-4;
-	}
-</style>

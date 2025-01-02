@@ -12,11 +12,13 @@ export async function load({ depends, locals: { session, supabase, db }, cookies
 		session = data.session;
 	}
 
-	const author = session ? await db.author.findFirst({
-		where: {
-			id: session.user.id
-		}
-	}) : null;
+	const author = session
+		? await db.author.findFirst({
+				where: {
+					id: session.user.id
+				}
+			})
+		: null;
 
 	console.log(`Retrieved author: ${author}`);
 

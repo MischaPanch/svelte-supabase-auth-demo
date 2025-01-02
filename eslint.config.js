@@ -34,4 +34,5 @@ export default ts.config(
 			'no-undef': 'off'
 		}
 	},
+	{ignores: ["supabase/**"]}
 );

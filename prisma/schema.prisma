@@ -1,46 +1,46 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 generator zod {
-  provider = "zod-prisma-types"
-  createRelationValuesTypes = true
-  output = "../src/lib/generated/zod"
+  provider                  = "zod-prisma-types"
+  output                    = "../src/lib/generated/zod"
+  createRelationValuesTypes = "true"
 }
 
 datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-// Links to auth.users.id from Supabase auth
 model Author {
-    id         String    @id @db.Uuid // references auth.users.id
-    email      String?   @unique   // sync with auth.users.email
-    name       String    @default("anonymous")
-    role       Role      @default(USER)
-    posts      Post[]
-    date_created DateTime  @default(now()) 
-    date_updated DateTime  @updatedAt
+  id           String    @id @db.Uuid
+  email        String?   @unique @db.VarChar(255)
+  name         String?   @default("anonymous") @db.VarChar(255)
+  role         Role?     @default(USER)
+  date_created DateTime? @default(now()) @db.Timestamp(6)
+  date_updated DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+  posts        Post[]
+  last_name    String?   @db.VarChar(255)
 
-    @@map("authors")
-    @@index([email])
+  @@index([email])
+  @@map("authors")
 }
 
 model Post {
-    id         String   @id @default(uuid()) @db.Uuid
-    author_id  String   @db.Uuid
-    author     Author   @relation(fields: [author_id], references: [id], onDelete: Cascade)
-    text       String   @db.Text
-    date_created DateTime @default(now())
-    date_updated DateTime @updatedAt
+  id           String    @id @default(uuid()) @db.Uuid
+  author_id    String    @db.Uuid
+  text         String
+  date_created DateTime? @default(now()) @db.Timestamp(6)
+  date_updated DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+  author       Author    @relation(fields: [author_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-    @@map("posts")
-    @@index([author_id])
+  @@index([author_id])
+  @@map("posts")
 }
 
 enum Role {
-    USER
-    ADMIN
+  USER
+  ADMIN
 }

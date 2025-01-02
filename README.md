@@ -1,51 +1,108 @@
-svelte-supabase-auth-demo
-=========================
+# svelte-supabase-auth-demo
 
-A small SvelteKit project demonstrating how to use...
+A small SvelteKit project demonstrating how to use:
 
-* :zap: [Supabase](https://supabase.com/) as serverless backend
-* :zap: [Zod](https://github.com/colinhacks/zod) for schema validation
-* :zap: [Prisma](https://www.prisma.io/) as ORM
-* :zap: [Passwordless email logins](https://supabase.com/docs/guides/auth/auth-email-passwordless)
-* :zap: [Anonymous sign ins](https://supabase.com/docs/guides/auth/auth-anonymous)
+- [bun](https://bun.sh) as a build tool
+- [Supabase](https://supabase.com/) as self-hosted auth and DB provider (spun up with docker-compose)
+- [Prisma](https://www.prisma.io/) as ORM and a minimal DB schema management tool
+- [Zod](https://github.com/colinhacks/zod) for schema validation
+- [Passwordless email logins](https://supabase.com/docs/guides/auth/auth-email-passwordless)
+- [Anonymous sign ins](https://supabase.com/docs/guides/auth/auth-anonymous)
 
-
-Prererquisites
---------------
+## Prerequisites
 
 1. Install bun, e.g. with `curl -sS https://webinstall.dev/bun | bash`
-1. Docker and docker-compose need to be installed for the Supabase instance
+1. Docker and docker-compose need to be installed for spinning up the Supabase instance
 
+## Initial Setup
 
-
-Usage
------
-
-1. Make env files with `cp .env.example .env` and `cp supabase/docker/.env.example supabase/docker/.env`
+1. Create env files with `cp .env.example .env` and `cp supabase/docker/.env.example supabase/docker/.env`
    The default values will work, but for production you should change the values. Note that the values in `.env` need
    to be consistent with the values in `supabase/docker/.env` (derived from the latter).
 1. Start the Supabase instance with `cd supabase/docker && docker compose up -d`
    In the default configuration, it will spin up a postgres database as part of the docker-compose setup.
    However, we can also **use an existing database** by adjusting the docker-compose file in the highlighted section.
-   In the default setting, an inbucket instance will be started as well, which can be accessed under [http://localhost:9000/](http://localhost:9000/). It is a mock email server that will intercept all emails sent by the application.
+   In the default setting, an inbucket instance will be started as well, which can be accessed under [http://localhost:9000/](http://localhost:9000/). It is a mock email server that will intercept all emails sent by the application. The supabase UI will be on [http://localhost:8000/](http://localhost:8000/) in the default configuration.
 1. Install dependencies:
-   
+
    ```
    bun install
    ```
-1. DB model code is generated with Prisma. Run the following command to generate/update the code:
-   
+
+1. DB model and zod validation code is generated with prisma (the latter uses a slightly adjusted version of the [zod-prisma-types](https://github.com/mischapanch/zod-prisma-types) package
+   ). Run the following command to generate/update the code:
    ```
-   bun run prisma-generate
+   bun prisma-generate
    ```
-1. Run the `init-db` command to initialize the database. The schema can be found in `prisma/schema.prisma` and the database seed query in `seed.sql`.
-   
-   ```
-   bun run init-db
-   ```
+   See section below on a clarification of the interplay between prisma and zod.
+1. In order to alter the schema with prisma, the `postgres` user needs to be a superuser. To achieve this, run the SQL commands in
+   [initial_db_setup.sql](initial_db_setup.sql). This can be done comfortable through the supabase UI.
 1. Start a dev server with
-   
+
    ```
-   bun run dev
+   bun dev
    ```
+
 1. Navigate to [http://localhost:5731](http://localhost:5173)
+
+## Formatting and Linting
+
+We use `prettier` and `eslint` for formatting and linting. The latter already lints some TS and Svelte specific things, but seems to be far from exhaustive. The inbuilt VSCode problem linter seems better. There are configured commands `bun format` and `bun lint` as well as `bun format-lint`.
+
+## Debugging
+
+There is a launch configuration for debugging in VSCode. It will start the server in debug mode, a client (currently configured to be edge) and attach the debugger to it. You can also attach to an existing edge instance. Feel free to extend the launch configuration to include other browsers.
+
+Debugging is particularly nice with SvelteKit. Feel free to add instructions for debugging server and client code in JetBrains IDEs.
+
+
+## Using Prisma
+
+Prisma is a very powerful DB management and ORM tool that has many features. We are going to use only a few of them.
+In particular, we are NOT going to use migrations. Prisma is used for
+
+1. Keeping schema in sync with the DB. This is achieved with `prisma db push/pull` commands (used through `bun db-push/db-pull`).
+1. Using the retrieval and ORM features of Prisma. This is done through the generated client code in `prisma/client`. We use things like `findMany`, `findUnique`, `create`, `update`, `delete` etc. to interact with the DB.
+1. The prisma-client related code is executed on the server side, so it is not exposed to the client. Find it `.server.ts` files.
+
+## Interplay between Prisma and Zod
+
+Prisma by itself generates types that can be used for annotations, like `Author` and `Posts`. The code declaring
+these types is quite convoluted, but functional. Even though prisma is not available in the client, we can still use the generated types in client-side code using `import type`, which is ignored at runtime.
+
+However, the types generated by prisma are not suitable for validation and serialization. Maybe validation is no all too important for us for retrieving data from the DB, as we will keep the prisma.schema (and thus the generated types) in sync with the DB schema. However, prisma types cannot be used at all to validate user data.
+
+Thus, for validating and parsing both DB data and user input, we use Zod. Unfortunately, this means we have to duplicate the DB models in Zod. There are a bunch of prisma-to-zod generators (most are abandoned), and none of them
+work properly. However, fortunately one of them (`zod-prisma-types`) almost does what we need. I (Mischa) have slightly
+modified it and included it in this project.
+
+Now the `bun run prisma-generate` will generate both the prisma client code and the zod schema code. The zod schema code must be in `lib` in order to be imported by the client, so it is put into `lib/generated/zod`. You should use the zod schemas for all validation and serialization tasks, as well as for type annotations.
+
+## Software Patterns Used
+
+### Smart Parent, Dumb Child
+
+This project implements the smart parent, dumb child pattern using Svelte's context API:
+
+#### Pattern Overview
+
+- Parent components (`+page.svelte`) handle business logic and data flow
+- Child components (`PostForm.svelte`) focus on UI presentation
+- Communication via Svelte's [context API](https://svelte.dev/tutorial/svelte/context-api) instead of prop drilling
+
+#### Implementation Example
+
+```svelte
+// Parent (+page.svelte)
+setContext('app', {
+  submitPost: async (text) => {
+    // Handles API calls
+    // Manages state updates
+    // Controls data invalidation
+  }
+});
+
+// Child (PostForm.svelte)
+const context = getContext('app');
+// Only handles UI and user input
+```

@@ -1,18 +1,12 @@
 import { z } from 'zod';
 import { PostWithRelationsSchema } from '$lib/generated/zod';
 
-
-export const baseResponseSchema = z.object({
+export const MessageResponseSchema = z.object({
 	message: z.string().optional()
 });
 
-export const postResponseSchema = baseResponseSchema.extend({
-	post: PostWithRelationsSchema.optional()
-});
-
-export const postsResponseSchema = baseResponseSchema.extend({
+export const PostArrayResponseSchema = MessageResponseSchema.extend({
 	posts: z.array(PostWithRelationsSchema)
 });
 
-
-export type PostsResponse = z.infer<typeof postsResponseSchema>;
+export type PostArrayResponse = z.infer<typeof PostArrayResponseSchema>;

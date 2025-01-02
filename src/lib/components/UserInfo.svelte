@@ -2,8 +2,6 @@
 	let { user }: { user: ForumUser } = $props();
 
 	let role = $state(user.forumRole);
-
-	const changeRole = async () => {};
 </script>
 
 <div class="vstack">
