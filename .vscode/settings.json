@@ -2,7 +2,9 @@
     "cSpell.words": [
         "datasource",
         "inbucket",
+        "Mischa",
         "pkey",
+        "sqlmodel",
         "supabase"
     ],
     "cSpell.enabledFileTypes": {
