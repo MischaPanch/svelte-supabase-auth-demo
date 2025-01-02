@@ -49,7 +49,7 @@
 			let { error: updateError } = await supabase.auth.updateUser({ email });
 
 			if (updateError) {
-				console.error('error updating user email: ' + updateError);
+				console.error(`error updating user email: ${updateError}`);
 			} else {
 				console.log(`email ${email} appears to be already attached to a user`);
 			}

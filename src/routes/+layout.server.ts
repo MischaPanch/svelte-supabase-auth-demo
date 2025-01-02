@@ -20,7 +20,7 @@ export async function load({ depends, locals: { session, supabase, db }, cookies
 			})
 		: null;
 
-	console.log(`Retrieved author: ${author}`);
+	console.log('Retrieved author:', JSON.stringify(author, null, 2));
 
 	if (session && author) {
 		session.user.user_metadata.name = author?.name;
